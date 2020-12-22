@@ -978,24 +978,24 @@ if __name__ == "__main__":
     print('Features upper: ', num_Features_upper)
 
      # save results to csv and pickle
-    path_results_for_each_fold = ("/data/shmuel/shmuel1/debbie/environment/parallel_script/MCI/612_results/X{}/results/fold{}/outerfold{}_results_for_each_fold_features_{}_{}.csv").format(dataset, outer_fold_cv, outer_fold_cv, num_Features_lower, num_Features_upper)
-    path_results_for_each_param = ("/data/shmuel/shmuel1/debbie/environment/parallel_script/MCI/612_results/X{}/results/fold{}/outerfold{}_results_for_each_param_setting_features_{}_{}.csv").format(dataset, outer_fold_cv, outer_fold_cv, num_Features_lower, num_Features_upper)
-    path_good_results = ("/data/shmuel/shmuel1/debbie/environment/parallel_script/MCI/612_results/X{}/results/fold{}/outerfold{}_good_results_features_{}_{}.csv").format(dataset, outer_fold_cv, outer_fold_cv, num_Features_lower, num_Features_upper)
+    path_results_for_each_fold = ("/data/shmuel/shmuel1/debbie/environment/parallel_script/MCI/612_REPMES_DKT_results/X{}/results/fold{}/outerfold{}_results_for_each_fold_features_{}_{}.csv").format(dataset, outer_fold_cv, outer_fold_cv, num_Features_lower, num_Features_upper)
+    path_results_for_each_param = ("/data/shmuel/shmuel1/debbie/environment/parallel_script/MCI/612_REPMES_DKT_results/X{}/results/fold{}/outerfold{}_results_for_each_param_setting_features_{}_{}.csv").format(dataset, outer_fold_cv, outer_fold_cv, num_Features_lower, num_Features_upper)
+    path_good_results = ("/data/shmuel/shmuel1/debbie/environment/parallel_script/MCI/612_REPMES_DKT_results/X{}/results/fold{}/outerfold{}_good_results_features_{}_{}.csv").format(dataset, outer_fold_cv, outer_fold_cv, num_Features_lower, num_Features_upper)
 
-    pkl_path_results_for_each_fold = ("/data/shmuel/shmuel1/debbie/environment/parallel_script/MCI/612_results/X{}/results/fold{}/outerfold{}_results_for_each_fold_features_{}_{}.pkl").format(dataset, outer_fold_cv, outer_fold_cv, num_Features_lower, num_Features_upper)
-    pkl_path_results_for_each_param = ("/data/shmuel/shmuel1/debbie/environment/parallel_script/MCI/612_results/X{}/results/fold{}/outerfold{}_results_for_each_param_setting_features_{}_{}.pkl").format(dataset, outer_fold_cv, outer_fold_cv, num_Features_lower, num_Features_upper)
-    pkl_path_good_results = ("/data/shmuel/shmuel1/debbie/environment/parallel_script/MCI/612_results/X{}/results/fold{}/outerfold{}_good_results_features_{}_{}.pkl").format(dataset, outer_fold_cv, outer_fold_cv, num_Features_lower, num_Features_upper)
+    pkl_path_results_for_each_fold = ("/data/shmuel/shmuel1/debbie/environment/parallel_script/MCI/612_REPMES_DKT_results/X{}/results/fold{}/outerfold{}_results_for_each_fold_features_{}_{}.pkl").format(dataset, outer_fold_cv, outer_fold_cv, num_Features_lower, num_Features_upper)
+    pkl_path_results_for_each_param = ("/data/shmuel/shmuel1/debbie/environment/parallel_script/MCI/612_REPMES_DKT_results/X{}/results/fold{}/outerfold{}_results_for_each_param_setting_features_{}_{}.pkl").format(dataset, outer_fold_cv, outer_fold_cv, num_Features_lower, num_Features_upper)
+    pkl_path_good_results = ("/data/shmuel/shmuel1/debbie/environment/parallel_script/MCI/612_REPMES_DKT_results/X{}/results/fold{}/outerfold{}_good_results_features_{}_{}.pkl").format(dataset, outer_fold_cv, outer_fold_cv, num_Features_lower, num_Features_upper)
 
     print('path_results_for_each_fold', path_results_for_each_fold)
     print('path_results_for_each_param', path_results_for_each_param)
     print('path_good_results', path_good_results)
 
     # load data specify the path for 
-    dataset_path = ("/data/shmuel/shmuel1/debbie/environment/parallel_script/MCI/612_results/X{}.csv").format(dataset)
+    dataset_path = ("/data/shmuel/shmuel1/debbie/environment/parallel_script/MCI/dataREPMES_DKT/X{}.csv").format(dataset)
 
     X = np.genfromtxt(dataset_path, delimiter=',')
-    site = np.genfromtxt("/data/shmuel/shmuel1/debbie/environment/parallel_script/MCI/612_results/Site.csv", delimiter=',')
-    Y = np.genfromtxt("/data/shmuel/shmuel1/debbie/environment/parallel_script/MCI/612_results/Y.csv", delimiter=',')
+    site = np.genfromtxt("/data/shmuel/shmuel1/debbie/environment/parallel_script/MCI/dataREPMES_DKT/Site.csv", delimiter=',')
+    Y = np.genfromtxt("/data/shmuel/shmuel1/debbie/environment/parallel_script/MCI/dataREPMES_DKT/Y.csv", delimiter=',')
 
     # concate site data to X data
     X = np.concatenate((X, np.reshape(site, (-1, 1))), axis=1)

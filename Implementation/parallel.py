@@ -978,62 +978,55 @@ if __name__ == "__main__":
     print('Features upper: ', num_Features_upper)
 
      # save results to csv and pickle
-    path_results_for_each_fold = ("/data/shmuel/shmuel1/debbie/environment/parallel_script/MCI/612_results/X{}/results/fold{}/outerfold{}_results_for_each_fold_features_{}_{}.csv").format(dataset, outer_fold_cv, outer_fold_cv, num_Features_lower, num_Features_upper)
-    path_results_for_each_param = ("/data/shmuel/shmuel1/debbie/environment/parallel_script/MCI/612_results/X{}/results/fold{}/outerfold{}_results_for_each_param_setting_features_{}_{}.csv").format(dataset, outer_fold_cv, outer_fold_cv, num_Features_lower, num_Features_upper)
-    path_good_results = ("/data/shmuel/shmuel1/debbie/environment/parallel_script/MCI/612_results/X{}/results/fold{}/outerfold{}_good_results_features_{}_{}.csv").format(dataset, outer_fold_cv, outer_fold_cv, num_Features_lower, num_Features_upper)
+    path_results_for_each_fold = ("/data/shmuel/shmuel1/debbie/environment/parallel_script/MCI/base_results/X{}/results/fold{}/outerfold{}_results_for_each_fold_features_{}_{}.csv").format(dataset, outer_fold_cv, outer_fold_cv, num_Features_lower, num_Features_upper)
+    path_results_for_each_param = ("/data/shmuel/shmuel1/debbie/environment/parallel_script/MCI/base_results/X{}/results/fold{}/outerfold{}_results_for_each_param_setting_features_{}_{}.csv").format(dataset, outer_fold_cv, outer_fold_cv, num_Features_lower, num_Features_upper)
+    path_good_results = ("/data/shmuel/shmuel1/debbie/environment/parallel_script/MCI/base_results/X{}/results/fold{}/outerfold{}_good_results_features_{}_{}.csv").format(dataset, outer_fold_cv, outer_fold_cv, num_Features_lower, num_Features_upper)
 
-    pkl_path_results_for_each_fold = ("/data/shmuel/shmuel1/debbie/environment/parallel_script/MCI/612_results/X{}/results/fold{}/outerfold{}_results_for_each_fold_features_{}_{}.pkl").format(dataset, outer_fold_cv, outer_fold_cv, num_Features_lower, num_Features_upper)
-    pkl_path_results_for_each_param = ("/data/shmuel/shmuel1/debbie/environment/parallel_script/MCI/612_results/X{}/results/fold{}/outerfold{}_results_for_each_param_setting_features_{}_{}.pkl").format(dataset, outer_fold_cv, outer_fold_cv, num_Features_lower, num_Features_upper)
-    pkl_path_good_results = ("/data/shmuel/shmuel1/debbie/environment/parallel_script/MCI/612_results/X{}/results/fold{}/outerfold{}_good_results_features_{}_{}.pkl").format(dataset, outer_fold_cv, outer_fold_cv, num_Features_lower, num_Features_upper)
+    pkl_path_results_for_each_fold = ("/data/shmuel/shmuel1/debbie/environment/parallel_script/MCI/base_results/X{}/results/fold{}/outerfold{}_results_for_each_fold_features_{}_{}.pkl").format(dataset, outer_fold_cv, outer_fold_cv, num_Features_lower, num_Features_upper)
+    pkl_path_results_for_each_param = ("/data/shmuel/shmuel1/debbie/environment/parallel_script/MCI/base_results/X{}/results/fold{}/outerfold{}_results_for_each_param_setting_features_{}_{}.pkl").format(dataset, outer_fold_cv, outer_fold_cv, num_Features_lower, num_Features_upper)
+    pkl_path_good_results = ("/data/shmuel/shmuel1/debbie/environment/parallel_script/MCI/base_results/X{}/results/fold{}/outerfold{}_good_results_features_{}_{}.pkl").format(dataset, outer_fold_cv, outer_fold_cv, num_Features_lower, num_Features_upper)
 
     print('path_results_for_each_fold', path_results_for_each_fold)
     print('path_results_for_each_param', path_results_for_each_param)
     print('path_good_results', path_good_results)
 
-    # load data specify the path for 
-    dataset_path = ("/data/shmuel/shmuel1/debbie/environment/parallel_script/MCI/612_results/X{}.csv").format(dataset)
+    # load data
+    dataset_path = ("/data/shmuel/shmuel1/debbie/environment/parallel_script/MCI/data/X{}.csv").format(dataset)
 
     X = np.genfromtxt(dataset_path, delimiter=',')
-    site = np.genfromtxt("/data/shmuel/shmuel1/debbie/environment/parallel_script/MCI/612_results/Site.csv", delimiter=',')
-    Y = np.genfromtxt("/data/shmuel/shmuel1/debbie/environment/parallel_script/MCI/612_results/Y.csv", delimiter=',')
+    site = np.genfromtxt("/data/shmuel/shmuel1/debbie/environment/parallel_script/MCI/data/Site.csv", delimiter=',')
+    Y = np.genfromtxt("/data/shmuel/shmuel1/debbie/environment/parallel_script/MCI/data/Y.csv", delimiter=',')
 
     # concate site data to X data
     X = np.concatenate((X, np.reshape(site, (-1, 1))), axis=1)
 
     # load pre-splitted train-test index
-
-    # TODO: move the new outer_train_index.pickle to debbie's directory
-
-    outer_train_index_pickle = open("/data/shmuel/shmuel1/debbie/environment/parallel_script/MCI/split_matlab/outer_train_index.pickle", "rb")
+    outer_train_index_pickle = open("/data/shmuel/shmuel1/debbie/environment/parallel_script/MCI/split/outer_train_index.pickle", "rb")
     outer_train_indexes = pickle.load(outer_train_index_pickle)
-    outer_train_index_pickle.close()
-
-    outer_test_index_pickle = open("/data/shmuel/shmuel1/debbie/environment/parallel_script/MCI/split_matlab/outer_test_index.pickle", "rb")
-    outer_test_indexes = pickle.load(outer_test_index_pickle)
-    outer_test_index_pickle.close()
 
     # print('All outer fold indexes: ', outer_train_indexes)
 
     # split the data based on outer fold
     outer_train_index = outer_train_indexes[outer_fold_cv]
-    outer_test_index = outer_test_indexes[outer_fold_cv]
-
-
     # print('Outer fold: ', outer_fold_cv)
     # print('Fold index: ', outer_train_index)
 
-    index_book_pickle = open("/data/shmuel/shmuel1/debbie/environment/parallel_script/MCI/split_matlab/subjects_scans_index.pickle", "rb")
-    index_book = pickle.load(index_book_pickle)
-    index_book_pickle.close()   
-
-    for i in outer_test_index:
-        index_book.pop(i)
-
     # loda the fold specific data
-    # X_fold = X[outer_train_index]
-    # Y_fold = Y[outer_train_index]
+    X_fold = X[outer_train_index]
+    Y_fold = Y[outer_train_index]
 
-    inner_cv_fold = len(outer_train_index)
+    # split inner folds
+    inner_cv_fold = 12
+    skf_inner = StratifiedKFold(n_splits=inner_cv_fold, shuffle=True, random_state=1000)
+
+    inner_train_indexes = []
+    inner_test_indexes = []
+
+    for train_outer, test_outer in skf_inner.split(X_fold, X_fold[:,-1]):
+        # print("test_outer", test_outer)
+        inner_train_indexes.append(train_outer)
+        inner_test_indexes.append(test_outer)
+
 
     # create paramater grid
     weighting = [1, 5, 10, 20, 50, 100]
