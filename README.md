@@ -47,10 +47,14 @@ After running the `initialize.sh` script, `base_results` , `612_results`, `DKT_r
 
 ```bash
 mkdir -p ./612_results/Xs/results/fold{0..4} // this indicates there are 5 outer folds and 
-																						// change to fold{0..9} if 10 outer folds are 																							// needed
+																						// change to fold{0..9} if 10 outer folds are 																																// needed
 ```
 
+To execute the `initialize.sh` script, just run:
 
+```bash
+source initialize.sh
+```
 
 This repository consists mainly of implemented code files. The raw data can be found on the BIC server under the following directory:
 
@@ -308,7 +312,7 @@ EOF
 done
 ```
 
-This is the snapshpt of the bash script for executing `parallel_LOSO.py` on BIC clusters. There are four parameters that needs to be specified: 
+This is the snapshpt of the bash script `p_job_LOSO.sh`  for executing `parallel_LOSO.py` on BIC clusters. There are four parameters that needs to be specified: 
 
 - `dataset` ( ‘c’, ‘i’, ‘s’ ): indicates which dataset to use lower: indicates the lower bound number of features
 - `upper`: indicates the upper bound number of features 
@@ -317,4 +321,157 @@ This is the snapshpt of the bash script for executing `parallel_LOSO.py` on BIC 
 - The gridsearch is performed on the dataset Xc with the number of features from 2 to 5.
 
 
+
+To execute the `p_job_LOSO.sh` script, just run:
+
+```bash
+source p_job_LOSO.sh
+```
+
+
+
+## 5. Results Compilation for Inner Loop Results
+
+After the inner fold execution finishes, results will be stored in separate files instead of a whole. The first step is to compile the results. `compile_results.ipynb` is used for this purpose.
+
+```python
+import numpy as np
+import pandas as pd
+import pickle
+import os
+
+for i in range(5):
+    fold = i
+    dataset = 'i'
+    fold = str(fold)
+
+    path = "/Users/wenzongxia/Desktop/DP/dp_local/X"+dataset+"_results/results/" + "fold" + fold + "/fold"
+    print(path)
+    all_df = []
+    
+    lst = os.listdir(path)
+    if '.DS_Store' in lst:
+        lst.remove('.DS_Store')
+
+    lst.sort(key=lambda f: int(f.split('_')[-2]))
+    
+    for file in lst:
+        if file.startswith('.'):
+            continue
+        filename = os.fsdecode(file)
+        print(filename)
+        df = pd.read_pickle(path + '/' + filename)
+        all_df.append(df)
+
+    new_df = pd.concat(all_df, ignore_index=True)
+
+    new_df.to_pickle("/Users/wenzongxia/Desktop/DP/dp_local/X"+dataset+"_results/results/" + "fold" + fold + "/outerfold" + fold + "_results_for_each_fold.pkl")
+
+    print("fold")
+    print(new_df.info())
+
+    path = "/Users/wenzongxia/Desktop/DP/dp_local/X"+dataset+"_results/results/" + "fold" + fold + "/param"
+    all_df = []
+    
+    lst = os.listdir(path)
+    lst.sort(key=lambda f: int(f.split('_')[-2]))
+    
+    if '.DS_Store' in lst:
+        lst.remove('.DS_Store')
+        
+    for file in lst:
+        if file.startswith('.'):
+            continue
+        filename = os.fsdecode(file)
+        print(filename)
+        df = pd.read_pickle(path + '/' + filename)
+        all_df.append(df)
+
+    new_df = pd.concat(all_df, ignore_index=True)
+    new_df.to_pickle("/Users/wenzongxia/Desktop/DP/dp_local/X"+dataset+"_results/results/" + "fold" + fold + "/outerfold" + fold + "_results_for_each_param_setting.pkl")
+    print("param")
+    print(new_df.info())
+
+    path = "/Users/wenzongxia/Desktop/DP/dp_local/X"+dataset+"_results/results/" + "fold" + fold + "/good"
+    all_df = []
+
+    lst = os.listdir(path)
+    lst.sort(key=lambda f: int(f.split('_')[-2]))
+    
+    if '.DS_Store' in lst:
+        lst.remove('.DS_Store')
+        
+    for file in lst:
+        if file.startswith('.'):
+            continue
+        filename = os.fsdecode(file)
+        print(filename)
+        df = pd.read_pickle(path + '/' + filename)
+        all_df.append(df)
+
+    new_df = pd.concat(all_df, ignore_index=True)
+    new_df.to_pickle("/Users/wenzongxia/Desktop/DP/dp_local/X"+dataset+"_results/results/" + "fold" + fold + "/outerfold" + fold + "_good_results.pkl")
+    print("good")
+    print(new_df.info())
+```
+
+The above is a snapshot of the helper script to compile the results together. There are three variales needs to be defined:
+
+
+
+## 6. Data Interpretation
+
+The process is to find out the good analysis from the inner loop execution. `Interpretation.ipynb` file is used for this purpose. 
+
+```python
+fold =4
+dataset = 'i'
+fold = str(fold)
+
+df_results_of_each_param = pd.read_pickle("./X"+dataset+"_results/results/fold" + fold + "/outerfold" + fold + "_results_for_each_param_setting.pkl")
+df_results_of_each_fold = pd.read_pickle("./X"+dataset+"_results/results/fold" + fold + "/outerfold" + fold + "_results_for_each_fold.pkl")
+good_results = pd.read_pickle("./X"+dataset+"_results/results/fold" + fold + "/outerfold" + fold + "_good_results.pkl")
+```
+
+The above snap shot shows the variables to be defined. Including which dataset and the path to the dataset.
+
+
+
+### 7. Outerfold Validation
+
+The last stage is valid the supposedly good inner fold results. `outerloop_validation.ipynb` file is used. 
+
+The data set to be validated on is defined in this section of the code:
+
+```python
+Xs = np.genfromtxt("./data612/Xs.csv", delimiter=',')
+Xc = np.genfromtxt("./data612/Xc.csv", delimiter=',')
+Xi = np.genfromtxt("./data612/Xi.csv", delimiter=',')
+
+site = np.genfromtxt("./data612/Site.csv", delimiter=',')
+
+Y  = np.genfromtxt("./data612/Y.csv", delimiter=',')
+
+# Preview the size of Xs
+print("Xs.shape before attaching site",Xs.shape)
+print("Y.shape",Y.shape)
+print("site.shape",site.shape)
+
+# append site data to the end of X for simplicity
+Xs = np.concatenate((Xs, np.reshape(site, (-1, 1))), axis=1)
+Xc = np.concatenate((Xc, np.reshape(site, (-1, 1))), axis=1)
+Xi = np.concatenate((Xi, np.reshape(site, (-1, 1))), axis=1)
+
+print("Xs.shape after attaching site",Xs.shape)
+print("Xc.shape after attaching site",Xc.shape)
+print("Xi.shape after attaching site",Xi.shape)
+```
+
+---
+
+To read the filtered_good_results data, the following section of the code shall be specified:
+
+```python
+filtered_good_results = pd.read_pickle("./X"+dataset+"_results/results/fold" + fold + "/filtered_good_results_fold" + fold + ".pkl")
+```
 
