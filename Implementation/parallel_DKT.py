@@ -1051,9 +1051,9 @@ if __name__ == "__main__":
         fold_result_temp = pd.DataFrame(columns = columns_fold_results)
 
         # compute 12 folds in parallel and store the combined results
-        results = Parallel(n_jobs=8)(delayed(integrated_grid_search)(X, Y, dataset, index_book, 
-            fold, param, outer_train_index, weighting)
-            for fold in outer_train_index)
+        results = Parallel(n_jobs=-1)(delayed(integrated_grid_search)(X_fold, Y_fold, dataset, inner_train_indexes,
+                                                                      inner_test_indexes, fold, param, outer_train_index, weighting)
+                                      for fold in range(inner_cv_fold))
 
         # iterate through the results of 12 folds and append each fold
         for row in results:
