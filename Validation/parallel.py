@@ -579,7 +579,7 @@ def integrated_grid_search(
     nFeatures = param_grid.get('n_features')
     n_classifiers = 3
 
-    print(subtype_label[X_test_i])
+    # print(subtype_label[X_test_i])
     # print("num_P", num_P)
     # print("num_S", num_S)
 

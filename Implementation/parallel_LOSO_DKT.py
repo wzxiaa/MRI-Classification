@@ -172,21 +172,21 @@ class Combatstep():
 ################################################# Statistical Contrast #################################################
 
 def t_test(X, y):
-    
+
     def separate(X, y):
         # Y is the classes (1=stable, 2=progressor)
         P_X, S_X = [], []
         for i in range(X.shape[0]):
-            if  y[i] == 0:
+            if y[i] == 1:
                 S_X.append(X[i])
-            elif y[i] == 1:
+            elif y[i] == 2:
                 P_X.append(X[i])
         return np.asarray(P_X), np.asarray(S_X)
 
     def t_test(P, S, y):
         t_vals = []
         for i in range(P.shape[1]):
-            t_score, p_val = stats.ttest_ind(P[:,i], S[:,i])
+            t_score, p_val = stats.ttest_ind(P[:, i], S[:, i])
             tuple_ = (abs(t_score), abs(p_val))
             t_vals.append((tuple_, i))
         return t_vals
@@ -194,15 +194,15 @@ def t_test(X, y):
     def select(X, y, t_vals, percentage=.1):
         total_nfeatures = X.shape[1]
         filtered_nfeatures = math.ceil(total_nfeatures*percentage)
-        print("total_nfeatures: ",total_nfeatures)
-        print("filtered_nfeatures", filtered_nfeatures)
+        # print("total_nfeatures: ", total_nfeatures)
+        # print("filtered_nfeatures", filtered_nfeatures)
         sorted_t_val = sorted(t_vals, key=lambda tup: tup[0][0], reverse=True)
-        print(sorted_t_val)
+        # print(sorted_t_val)
         selected_indices = [i[1] for i in sorted_t_val[:filtered_nfeatures]]
         sorted_selected_indices = sorted(selected_indices)
-        X_reduced = X[:,sorted_selected_indices]
+        X_reduced = X[:, sorted_selected_indices]
         return X_reduced, sorted_selected_indices
-    
+
     P_X, S_X = separate(X, y)
     t_vals = t_test(P_X, S_X, y)
     X_reduced, selected_indices = select(X, y, t_vals)
