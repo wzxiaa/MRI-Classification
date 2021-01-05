@@ -882,23 +882,23 @@ def computePPV(numP, numS, y_pred, y_act):
     n_class = numP + numS
     P_range, S_range = np.arange(0, numP), np.arange(numP, n_class)
     dic = {}
-    print("y_act", y_act)
-    print("y_pred", y_pred)
+    # print("y_act", y_act)
+    # print("y_pred", y_pred)
     for i in range(n_class):
         print("class label:", i)
         if (i in P_range):
-            print("%d in P class" % (i))
+            # print("%d in P class" % (i))
             y_p = binarize(i, y_pred)
-            print("predicted y after binarization", y_p)
+            # print("predicted y after binarization", y_p)
             y_a = binarizeP(y_act)
-            print("actual y after binarization of P", y_a)
+            # print("actual y after binarization of P", y_a)
             score = precision(y_a, y_p)
         else:
-            print("%d in S class" % (i))
+            # print("%d in S class" % (i))
             y_p = binarize(i, y_pred)
-            print("predicted y after binarization", y_p)
+            # print("predicted y after binarization", y_p)
             y_a = binarizeS(y_act)
-            print("actual y after binarization of S", y_a)
+            # print("actual y after binarization of S", y_a)
             score = precision(y_a, y_p)
         dic[i] = score
     return dic
