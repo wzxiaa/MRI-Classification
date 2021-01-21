@@ -977,32 +977,53 @@ if __name__ == "__main__":
     # specify which data set to be worked on
     dataset = sys.argv[1].lower()
 
+    # specify the class separation
+    class_sep = int(sys.argv[2])
+
     # specify which outer fold
-    outer_fold_cv = int(sys.argv[2])
+    outer_fold_cv = int(sys.argv[3])
 
     # specify the number of features to be searched
-    num_Features_lower = int(sys.argv[3])
+    num_Features_lower = int(sys.argv[4])
 
-    num_Features_upper = int(sys.argv[4])
+    num_Features_upper = int(sys.argv[5])
 
-    print('Outer fold:', outer_fold_cv)
+    print('Dataset: ', dataset)
+    print('Class separation: ', class_sep)
+    print('Outer fold: ', outer_fold_cv)
     print('Features lower: ', num_Features_lower)
     print('Features upper: ', num_Features_upper)
 
-    # save results to csv and pickle
-    path_results_for_each_fold = ("./results/fold{}/outerfold{}_results_for_each_fold_features_{}_{}.csv").format(
-        outer_fold_cv, outer_fold_cv, num_Features_lower, num_Features_upper)
-    path_results_for_each_param = ("./results/fold{}/outerfold{}_results_for_each_param_setting_features_{}_{}.csv").format(
-        outer_fold_cv, outer_fold_cv, num_Features_lower, num_Features_upper)
-    path_good_results = ("./results/fold{}/outerfold{}_good_results_features_{}_{}.csv").format(
-        outer_fold_cv, outer_fold_cv, num_Features_lower, num_Features_upper)
+    base_result_path = ('./results/{}/fold{}').format(class_sep, outer_fold_cv)
+    try:
+        if not os.path.exists(base_result_path):
+            os.mkdir(('./results/{}').format(class_sep))
+            os.mkdir(('./results/{}/fold{}').format(class_sep, outer_fold_cv))
+    except OSError:
+        print("Creation of directory %s failed" % base_result_path)
+    else:
+        print("Successfully created the directory %s " % base_result_path)
 
-    pkl_path_results_for_each_fold = ("./results/fold{}/outerfold{}_results_for_each_fold_features_{}_{}.pkl").format(
-        outer_fold_cv, outer_fold_cv, num_Features_lower, num_Features_upper)
-    pkl_path_results_for_each_param = ("./results/fold{}/outerfold{}_results_for_each_param_setting_features_{}_{}.pkl").format(
-        outer_fold_cv, outer_fold_cv, num_Features_lower, num_Features_upper)
-    pkl_path_good_results = ("./results/fold{}/outerfold{}_good_results_features_{}_{}.pkl").format(
-        outer_fold_cv, outer_fold_cv, num_Features_lower, num_Features_upper)
+    # define path name for saved csv and pkl result files
+    path_results_for_each_fold = base_result_path + \
+        ("/outerfold{}_results_for_each_fold_features_{}_{}.csv").format(outer_fold_cv,
+                                                                         num_Features_lower, num_Features_upper)
+    path_results_for_each_param = base_result_path + \
+        ("/outerfold{}_results_for_each_param_setting_features_{}_{}.csv").format(
+            outer_fold_cv, num_Features_lower, num_Features_upper)
+    path_good_results = base_result_path + \
+        ("/outerfold{}_good_results_features_{}_{}.csv").format(outer_fold_cv,
+                                                                num_Features_lower, num_Features_upper)
+
+    pkl_path_results_for_each_fold = base_result_path + \
+        ("/outerfold{}_results_for_each_fold_features_{}_{}.pkl").format(outer_fold_cv,
+                                                                         num_Features_lower, num_Features_upper)
+    pkl_path_results_for_each_param = base_result_path + \
+        ("/outerfold{}_results_for_each_param_setting_features_{}_{}.pkl").format(
+            outer_fold_cv, num_Features_lower, num_Features_upper)
+    pkl_path_good_results = base_result_path + \
+        ("/outerfold{}_good_results_features_{}_{}.pkl").format(outer_fold_cv,
+                                                                num_Features_lower, num_Features_upper)
 
     print('path_results_for_each_fold', path_results_for_each_fold)
     print('path_results_for_each_param', path_results_for_each_param)
@@ -1011,23 +1032,24 @@ if __name__ == "__main__":
     # load data
     # dataset_path = (
     #     "/data/shmuel/shmuel1/debbie/environment/parallel_script/MCI/data/X{}.csv").format(dataset)
-    dataset_path = "./datasets/X_integrated.csv"
+    dataset_path = (
+        "./datasets/integrated/{}/X_{}_integrated.csv").format(class_sep, class_sep)
 
     X = np.genfromtxt(dataset_path, delimiter=',')
     # site = np.genfromtxt(
     #     "/data/shmuel/shmuel1/debbie/environment/parallel_script/MCI/data/Site.csv", delimiter=',')
     Y = np.genfromtxt(
-        "./datasets/y_integrated.csv", delimiter=',')
+        (("./datasets/integrated/{}/y_{}_integrated.csv").format(class_sep, class_sep)), delimiter=',')
 
     subtype_labels = np.genfromtxt(
-        "./datasets/subtype_labels.csv", delimiter=',')
+        (("./datasets/integrated/{}/subtype_labels_{}.csv").format(class_sep, class_sep)), delimiter=',')
 
     # concate site data to X data
     # X = np.concatenate((X, np.reshape(site, (-1, 1))), axis=1)
 
     # load pre-splitted train-test index
     outer_train_index_pickle = open(
-        "./split/outer_train_index.pickle", "rb")
+        ("./split/{}/outer_train_index.pickle").format(class_sep), "rb")
     outer_train_indexes = pickle.load(outer_train_index_pickle)
 
     # print('All outer fold indexes: ', outer_train_indexes)
